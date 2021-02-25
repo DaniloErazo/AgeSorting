@@ -3,7 +3,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
+import java.math.BigDecimal;
+
 
 public class Main {
 	
@@ -12,31 +13,30 @@ public class Main {
 	private final static BufferedWriter bWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 	
 	public static void main(String[] args) throws IOException {
-		//String reps = bReader.readLine();
-		//int repsInt = Integer.parseInt(reps);
-		//readInput();
+		String reps = bReader.readLine();
+		int repsInt = Integer.parseInt(reps);
+		inputOutput(repsInt);
 		
-		//ask about iterate with bufferedreader 
-		/*while() {
-			readInput();
-			repsInt--;
-			System.out.println(repsInt);
-		}*/
-		
-		double[] test = new double[] {3.04, 1.31, 9.58, 9.44, 2.65, 9.13, 0.23, 8.99, 0.86, 4.15};
-		double[] finalArray = bubbleSort(test);
-		//System.out.println(Arrays.toString(finalArray));
 	}
 	
-	public static void readInput() throws IOException {
+	public static void inputOutput(int reps) throws IOException {
+		String finalOutputString="";
+		while(reps>0) {
 		String line = bReader.readLine();
 		String[] partStrings = line.split(" ");
-		stringArraytoDouble(partStrings);
+		double[] array = stringArraytoDouble(partStrings);
+		finalOutputString += bubbleSort(array) + "\n";
+		reps--;
+		}
+		bWriter.write(finalOutputString);
+		bWriter.flush();
+		bReader.close();
+		bWriter.close();
 		
 		
 	}
 	
-	public static double[] bubbleSort(double[] array) {
+	public static String bubbleSort(double[] array) {
 		int i = 0;
 		double totalChanges=0;
 		for (i = 1; i < array.length; i++) {
@@ -53,14 +53,29 @@ public class Main {
 			
 			
 		}
-		double average = totalChanges/(i-1);
+		
+		double average = totalChanges/(i-1); 		//calculate average
+		BigDecimal b = BigDecimal.valueOf(average); //Double to BigDecimal
+		int decimals = b.scale();					//calculate number of decimals 
+		
+		String decimalPart = String.valueOf(average);
+		String decimalPartS = decimalPart.substring(decimalPart.indexOf('.')); //take out decimal part 
+		BigDecimal averageDecimal;
+		
+		if(decimals==1) {
+		averageDecimal = truncateDecimal(average, 1);
+		}else if(decimalPartS.charAt(2)=='0') {
+			averageDecimal = truncateDecimal(average, 1);
+		}else {
+			averageDecimal = truncateDecimal(average, 2);
+		}
 		StringBuilder builder = new StringBuilder();
 		for (Double value : array) {
 		    builder.append(value + " ");
 		}
-		String text = builder.toString();
-		System.out.println(average + "-" + text );
-		return array;
+		String text = builder.toString().trim();
+		return (averageDecimal + "-" + text );
+		
 	}
 	 
 	public static double[] stringArraytoDouble(String[] splitArr) {
@@ -69,6 +84,15 @@ public class Main {
 	      intArr[i] = Double.parseDouble(splitArr[i]);
 	    }
 	    return intArr;
-	  }
+	}
+	
+	private static BigDecimal truncateDecimal(double x,int numberofDecimals)
+	{
+	    if ( x > 0) {
+	        return new BigDecimal(String.valueOf(x)).setScale(numberofDecimals, BigDecimal.ROUND_FLOOR);
+	    } else {
+	        return new BigDecimal(String.valueOf(x)).setScale(numberofDecimals, BigDecimal.ROUND_CEILING);
+	    }
+	}
 
 }
